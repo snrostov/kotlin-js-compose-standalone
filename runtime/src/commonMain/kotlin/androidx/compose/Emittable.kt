@@ -24,6 +24,8 @@ package androidx.compose
  * subsequent reconciliations are calculated.
  */
 interface Emittable {
+    var rootComponent: Component?
+
     fun emitInsertAt(index: Int, instance: Emittable)
     fun emitRemoveAt(index: Int, count: Int)
     fun emitMove(from: Int, to: Int, count: Int)

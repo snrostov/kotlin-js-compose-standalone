@@ -16,12 +16,12 @@
 
 package androidx.compose
 
-private class RecomposeHelper : Function0<Unit> {
+private class RecomposeHelper /*: Function0<Unit>*/ {
 
     var isComposing = false
     var recompose: () -> Unit = { throw Error("Recompose not yet initialized") }
 
-    override fun invoke() {
+    /*override*/ operator fun invoke() {
         recompose()
     }
 }
@@ -65,13 +65,13 @@ fun Recompose(body: @Composable() (recompose: () -> Unit) -> Unit) {
     val callback = composer.startJoin(0, false) {
         recomposer.isComposing = true
         @Suppress("PLUGIN_ERROR")
-        body(recomposer)
+        body { recomposer() }
         recomposer.isComposing = false
     }
     recomposer.recompose = { if (!recomposer.isComposing) callback(false) }
     recomposer.isComposing = true
     @Suppress("PLUGIN_ERROR")
-    body(recomposer)
+    body { recomposer() }
     recomposer.isComposing = false
     composer.doneJoin(false)
 }

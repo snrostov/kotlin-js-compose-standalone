@@ -29,8 +29,6 @@ expect open class ThreadLocal<T>() {
     protected open fun initialValue(): T?
 }
 
-expect class WeakHashMap<K, V>() : MutableMap<K, V>
-
 expect fun identityHashCode(instance: Any?): Int
 
 expect interface ViewParent

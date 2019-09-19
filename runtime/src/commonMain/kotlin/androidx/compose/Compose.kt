@@ -37,8 +37,7 @@ object Compose {
         }
     }
 
-    private val TAG_ROOT_COMPONENT = "composeRootComponent".hashCode()
-    private val EMITTABLE_ROOT_COMPONENT = WeakHashMap<Emittable, Component>()
+    val TAG_ROOT_COMPONENT = "composeRootComponent".hashCode()
 
     private fun getRootComponent(view: View): Component? {
         return view.getTag(TAG_ROOT_COMPONENT) as? Component
@@ -60,12 +59,12 @@ object Compose {
     }
 
     private fun getRootComponent(emittable: Emittable): Component? {
-        return EMITTABLE_ROOT_COMPONENT[emittable]
+        return emittable.rootComponent
     }
 
     // TODO(b/138254844): Make findRoot/setRoot test-only & Android-only
     private fun setRoot(emittable: Emittable, component: Component) {
-        EMITTABLE_ROOT_COMPONENT[emittable] = component
+        emittable.rootComponent = component
     }
 
     /**
@@ -222,7 +221,7 @@ object Compose {
     ) {
         // temporary easy way to call correct lifecycles on everything
         composeInto(container, context, parent) {}
-        EMITTABLE_ROOT_COMPONENT.remove(container)
+        container.rootComponent = null
     }
 }
 

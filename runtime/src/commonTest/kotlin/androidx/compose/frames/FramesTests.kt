@@ -31,7 +31,7 @@ class FrameTest {
 
     @Test
     fun testCreatingAddress() {
-                val address = frame {
+        val address = frame {
             val address = Address(
                 OLD_STREET,
                 OLD_CITY
@@ -452,13 +452,13 @@ class FrameTest {
             assertTrue(
                 readAddresses.contains(address),
                 "Ensure a read callback was called for the address"
-                )
+            )
         }
         for (address in addressToIgnore) {
             assertFalse(
                 readAddresses.contains(address),
                 "Ensure a read callback was not called for the address"
-                )
+            )
         }
     }
 
@@ -492,13 +492,13 @@ class FrameTest {
             assertTrue(
                 committedAddresses?.contains(address) ?: false,
                 "Ensure written address is in the set of committed objects"
-                )
+            )
         }
         for (address in addressToIgnore) {
             assertFalse(
                 committedAddresses?.contains(address) ?: false,
                 "Ensure ignored addresses are not in the set of committed objects"
-                )
+            )
         }
     }
 
@@ -734,31 +734,38 @@ class FrameTest {
         }
 
         // Expect add to modify
-        validate { addresses.add(
-            Address(
-                NEW_STREET,
-                OLD_CITY
+        validate {
+            addresses.add(
+                Address(
+                    NEW_STREET,
+                    OLD_CITY
+                )
             )
-        ) }
-        validate { addresses.add(5,
-            Address(
-                NEW_STREET,
-                OLD_CITY
+        }
+        validate {
+            addresses.add(
+                5,
+                Address(
+                    NEW_STREET,
+                    OLD_CITY
+                )
             )
-        ) }
+        }
 
         // Expect addAll to modify
         validate {
-            addresses.addAll(listOf(
-                Address(
-                    NEW_STREET,
-                    NEW_CITY
-                ),
-                Address(
-                    NEW_STREET,
-                    NEW_CITY
+            addresses.addAll(
+                listOf(
+                    Address(
+                        NEW_STREET,
+                        NEW_CITY
+                    ),
+                    Address(
+                        NEW_STREET,
+                        NEW_CITY
+                    )
                 )
-            ))
+            )
         }
         validate {
             addresses.addAll(
@@ -795,10 +802,11 @@ class FrameTest {
         validate { addresses.retainAll(listOf(addresses[5], addresses[6])) }
 
         // Expect set to modify
-        validate { addresses[5] = Address(
-            NEW_STREET,
-            NEW_CITY
-        )
+        validate {
+            addresses[5] = Address(
+                NEW_STREET,
+                NEW_CITY
+            )
         }
 
         // Expect subList to modify
@@ -1205,5 +1213,7 @@ class AddressProp(streetValue: String) {
 
     var street: String
         get() = _street
-        set(value) { _street = value }
+        set(value) {
+            _street = value
+        }
 }
