@@ -37,27 +37,6 @@ object Compose {
         }
     }
 
-    val TAG_ROOT_COMPONENT = "composeRootComponent".hashCode()
-
-    private fun getRootComponent(view: View): Component? {
-        return view.getTag(TAG_ROOT_COMPONENT) as? Component
-    }
-
-    // TODO(b/138254844): Make findRoot/setRoot test-only & Android-only
-    fun findRoot(view: View): Component? {
-        var node: View? = view
-        while (node != null) {
-            val cc = node.getTag(TAG_ROOT_COMPONENT) as? Component
-            if (cc != null) return cc
-            node = node.parent as? View
-        }
-        return null
-    }
-
-    internal fun setRoot(view: View, component: Component) {
-        view.setTag(TAG_ROOT_COMPONENT, component)
-    }
-
     private fun getRootComponent(emittable: Emittable): Component? {
         return emittable.rootComponent
     }
@@ -83,7 +62,7 @@ object Compose {
         reference
     ).also {
         when (group) {
-            is ViewGroup -> setRoot(group, component)
+//            is ViewGroup -> setRoot(group, component)
             is Emittable -> setRoot(group, component)
         }
     }
@@ -106,33 +85,33 @@ object Compose {
      * @see Composable
      */
     // TODO(lmr): rename to compose?
-    @MainThread
-    fun composeInto(
-        container: ViewGroup,
-        parent: CompositionReference? = null,
-        composable: @Composable() () -> Unit
-    ): CompositionContext? {
-        var root = getRootComponent(container) as? Root
-        if (root == null) {
-            container.removeAllViews()
-            root = Root()
-            root.composable = composable
-            setRoot(container, root)
-            val cc = CompositionContext.prepare(
-                container.context,
-                container,
-                root,
-                parent
-            )
-            root.composer = cc
-            root.update()
-            return cc
-        } else {
-            root.composable = composable
-            root.update()
-        }
-        return null
-    }
+//    @MainThread
+//    fun composeInto(
+//        container: ViewGroup,
+//        parent: CompositionReference? = null,
+//        composable: @Composable() () -> Unit
+//    ): CompositionContext? {
+//        var root = getRootComponent(container) as? Root
+//        if (root == null) {
+//            container.removeAllViews()
+//            root = Root()
+//            root.composable = composable
+//            setRoot(container, root)
+//            val cc = CompositionContext.prepare(
+//                container.context,
+//                container,
+//                root,
+//                parent
+//            )
+//            root.composer = cc
+//            root.update()
+//            return cc
+//        } else {
+//            root.composable = composable
+//            root.update()
+//        }
+//        return null
+//    }
 
     /**
      * Disposes any composition previously run with [container] as the root. This will
@@ -148,13 +127,13 @@ object Compose {
      * @see Compose.composeInto
      * @see CompositionLifecycleObserver
      */
-    @MainThread
-    fun disposeComposition(container: ViewGroup, parent: CompositionReference? = null) {
-        // temporary easy way to call correct lifecycles on everything
-        // need to remove compositionContext from context map as well
-        composeInto(container, parent) { }
-        container.setTag(TAG_ROOT_COMPONENT, null)
-    }
+//    @MainThread
+//    fun disposeComposition(container: ViewGroup, parent: CompositionReference? = null) {
+//        // temporary easy way to call correct lifecycles on everything
+//        // need to remove compositionContext from context map as well
+//        composeInto(container, parent) { }
+//        container.setTag(TAG_ROOT_COMPONENT, null)
+//    }
 
     /**
      * This method is the way to initiate a composition. The [composable] passed in will be executed
@@ -225,21 +204,21 @@ object Compose {
     }
 }
 
-/**
- * Composes the children of the view with the passed in [composable]. This is a convenience method
- * around [Compose.composeInto].
- *
- * @see Compose.composeInto
- * @see disposeComposition
- */
-fun ViewGroup.setViewContent(composable: @Composable() () -> Unit): CompositionContext? =
-    Compose.composeInto(this, null, composable)
-
-/**
- * Disposes of a composition of the children of this view. This is a convenience method around
- * [Compose.disposeComposition].
- *
- * @see Compose.disposeComposition
- * @see compose
- */
-fun ViewGroup.disposeComposition() = Compose.disposeComposition(this, null)
+///**
+// * Composes the children of the view with the passed in [composable]. This is a convenience method
+// * around [Compose.composeInto].
+// *
+// * @see Compose.composeInto
+// * @see disposeComposition
+// */
+//fun ViewGroup.setViewContent(composable: @Composable() () -> Unit): CompositionContext? =
+//    Compose.composeInto(this, null, composable)
+//
+///**
+// * Disposes of a composition of the children of this view. This is a convenience method around
+// * [Compose.disposeComposition].
+// *
+// * @see Compose.disposeComposition
+// * @see compose
+// */
+//fun ViewGroup.disposeComposition() = Compose.disposeComposition(this, null)
