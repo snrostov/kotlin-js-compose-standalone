@@ -110,3 +110,18 @@ inline fun HtmlComposition.text(value: String) {
     emit(text, { cc.document.createTextNode(value) }, value, { textContent = it })
 }
 
+inline fun HtmlComposition.call(
+    key: Any,
+    invalid: Composer<Node>.() -> Boolean,
+    block: () -> Unit
+) = with(cc) {
+    startGroup(key)
+    if (invalid() || inserting) {
+        startGroup(invocation)
+        block()
+        endGroup()
+    } else {
+        (cc as Composer<*>).skipCurrentGroup()
+    }
+    endGroup()
+}

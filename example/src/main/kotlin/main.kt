@@ -16,16 +16,29 @@ fun main() {
             }
         }
         val composer = HtmlComposer(document, document.body!!, recomposer)
-
-        var counter = 0
         window.setInterval({
             composer.compose {
-                span {
-                    text("Hello, ")
-                    text("world ${counter++}!")
-                }
+                render()
             }
             composer.applyChanges()
         }, 1000)
     })
+}
+
+var counter = 0
+
+fun HtmlComposition.render() {
+    println("frame")
+    counter++
+    helloWorld("Ivan ${counter / 2}")
+}
+
+fun HtmlComposition.helloWorld(name: String) {
+    call(100, { cc.changed(name) }) {
+        println("rendering")
+        span {
+            text("Hello, ")
+            text("world $name!")
+        }
+    }
 }
