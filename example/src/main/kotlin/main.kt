@@ -3,11 +3,11 @@ import kotlin.browser.document
 import kotlin.browser.window
 
 @Composable
-fun App() {
-    Div {
-        Text("Hello, world!")
-    }
-}
+//fun App() {
+//    Div {
+//        Text("Hello, world!")
+//    }
+//}
 
 fun main() {
     window.addEventListener("load", {
@@ -30,15 +30,19 @@ var counter = 0
 fun HtmlComposition.render() {
     println("frame")
     counter++
-    helloWorld("Ivan ${counter / 2}")
+
+    val name = "Ivan ${counter / 2}"
+    call(
+        100,
+        { cc.changed(name) },
+        { helloWorld(name) }
+    )
 }
 
 fun HtmlComposition.helloWorld(name: String) {
-    call(100, { cc.changed(name) }) {
-        println("rendering")
-        span {
-            text("Hello, ")
-            text("world $name!")
-        }
+    println("rendering")
+    span {
+        text("Hello, ")
+        text("world $name!")
     }
 }

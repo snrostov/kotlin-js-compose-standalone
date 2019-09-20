@@ -13,10 +13,7 @@ class HtmlComposer(
     Applier(root, HtmlElementApplierAdapter),
     recomposer
 ) {
-    val rootComposition: HtmlComposition = object : HtmlComposition {
-        override val cc: HtmlComposer
-            get() = this@HtmlComposer
-    }
+    val rootComposition: HtmlComposition = HtmlComposition(this)
 
     fun compose(composition: HtmlComposition.() -> Unit) {
         composeRoot {
@@ -63,33 +60,49 @@ object HtmlElementApplierAdapter : ApplyAdapter<Node> {
     override fun Node.end(instance: Node, parent: Node) {}
 }
 
-interface HtmlComposition {
-    val cc: HtmlComposer
-}
+val composer get() = HtmlComposition(currentComposerNonNull as HtmlComposer)
 
-inline fun <V : Node> HtmlComposition.emit(
-    key: Any,
-    noinline factory: () -> V,
-    block: HtmlComposition.() -> Unit
-) {
-    cc.startNode(key)
-    cc.emitNode(factory)
-    block()
-    cc.endNode()
-}
-
-inline fun <V : Node, reified A1> HtmlComposition.emit(
-    key: Any,
-    noinline factory: () -> V,
-    a1: A1,
-    noinline set1: V.(A1) -> Unit
-) {
-    cc.startNode(key)
-    cc.emitNode(factory)
-    if (cc.changed(a1)) {
-        cc.apply(a1, set1)
+class HtmlComposition(val cc: HtmlComposer) {
+    inline fun <V : Node> emit(
+        key: Any,
+        noinline factory: () -> V,
+        block: HtmlComposition.() -> Unit
+    ) {
+        cc.startNode(key)
+        cc.emitNode(factory)
+        block()
+        cc.endNode()
     }
-    cc.endNode()
+
+    inline fun <V : Node, reified A1> emit(
+        key: Any,
+        noinline factory: () -> V,
+        a1: A1,
+        noinline set1: V.(A1) -> Unit
+    ) {
+        cc.startNode(key)
+        cc.emitNode(factory)
+        if (cc.changed(a1)) {
+            cc.apply(a1, set1)
+        }
+        cc.endNode()
+    }
+
+    inline fun call(
+        key: Any,
+        invalid: Composer<Node>.() -> Boolean,
+        block: () -> Unit
+    ) = with(cc) {
+        startGroup(key)
+        if (invalid() || inserting) {
+            startGroup(invocation)
+            block()
+            endGroup()
+        } else {
+            (cc as Composer<*>).skipCurrentGroup()
+        }
+        endGroup()
+    }
 }
 
 class SourceLocation(val name: String) {
@@ -108,20 +121,4 @@ inline fun HtmlComposition.span(noinline onClick: (() -> Unit)? = null, block: H
 val text = SourceLocation("text")
 inline fun HtmlComposition.text(value: String) {
     emit(text, { cc.document.createTextNode(value) }, value, { textContent = it })
-}
-
-inline fun HtmlComposition.call(
-    key: Any,
-    invalid: Composer<Node>.() -> Boolean,
-    block: () -> Unit
-) = with(cc) {
-    startGroup(key)
-    if (invalid() || inserting) {
-        startGroup(invocation)
-        block()
-        endGroup()
-    } else {
-        (cc as Composer<*>).skipCurrentGroup()
-    }
-    endGroup()
 }
