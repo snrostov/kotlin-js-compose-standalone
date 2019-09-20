@@ -17,13 +17,15 @@ fun main() {
         }
         val composer = HtmlComposer(document, document.body!!, recomposer)
 
-        composer.compose {
-            linear {
-                text("Hello, ")
-                text("world!")
+        var counter = 0
+        window.setInterval({
+            composer.compose {
+                span {
+                    text("Hello, ")
+                    text("world ${counter++}!")
+                }
             }
-        }
-
-        composer.applyChanges()
+            composer.applyChanges()
+        }, 1000)
     })
 }

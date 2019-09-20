@@ -97,12 +97,16 @@ class SourceLocation(val name: String) {
 }
 
 val linear = SourceLocation("linear")
-fun HtmlComposition.linear(block: HtmlComposition.() -> Unit) {
-    emit(linear, { cc.document.createElement("span") }, block)
+inline fun HtmlComposition.span(noinline onClick: (() -> Unit)? = null, block: HtmlComposition.() -> Unit) {
+    emit(linear, {
+        cc.document.createElement("span").also {
+            if (onClick != null) it.addEventListener("click", { onClick() })
+        }
+    }, block)
 }
 
 val text = SourceLocation("text")
-fun HtmlComposition.text(value: String) {
+inline fun HtmlComposition.text(value: String) {
     emit(text, { cc.document.createTextNode(value) }, value, { textContent = it })
 }
 
